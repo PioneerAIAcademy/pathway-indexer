@@ -55,6 +55,7 @@ def extract_user_inputs_from_csv(csv_path: str, input_columns: List[str] = None)
                         country = metadata.get("country", "")
                         user_language = metadata.get("user_language", "")
                         state = metadata.get("state", "")
+                        feedback = row.get("user_feedback", metadata.get("feedback", ""))
 
                         user_inputs.append({
                             "Question": input_text,
@@ -62,6 +63,7 @@ def extract_user_inputs_from_csv(csv_path: str, input_columns: List[str] = None)
                             "Country": country,
                             "User Language": user_language,
                             "State": state,
+                            "User Feedback": feedback,
                         })
 
     return user_inputs
@@ -114,7 +116,7 @@ def process_langfuse_data(traces_csv: str, observations_csv: str, output_folder:
         print("[WARNING] No user inputs to save.")
         return output_file
 
-    fieldnames = ["Date", "Country", "User Language", "State", "Question"]
+    fieldnames = ["Date", "Country", "User Language", "State", "Question", "User Feedback"]
 
     with open(output_file, "w", encoding="utf-8", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
