@@ -121,7 +121,17 @@ def process_langfuse_data(traces_csv: str, observations_csv: str, output_folder:
         print("[WARNING] No user inputs to save.")
         return output_file
 
-    fieldnames = ["Date", "Country", "User Language", "State", "City", "Question", "Output", "Metadata", "User Feedback"]
+    fieldnames = [
+        "Date",
+        "Country",
+        "User Language",
+        "State",
+        "City",
+        "Question",
+        "Output",
+        "Metadata",
+        "User Feedback",
+    ]
 
     with open(output_file, "w", encoding="utf-8", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
