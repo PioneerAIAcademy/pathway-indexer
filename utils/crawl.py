@@ -66,29 +66,6 @@ async def fetch_content_with_playwright(url, filepath):
         await browser.close()
 
 
-async def fetch_content_from_student_services(urls):
-    """Fetch content from student services page with tabs"""
-    plw = await async_playwright().start()
-    brwsr = await plw.chromium.launch()
-    pg = await brwsr.new_page()
-    content = ""
-    for url in urls:
-        print("crawling subpage: ", url["url"])
-        await pg.goto(url["url"])
-        await pg.wait_for_load_state()
-        cntnt = await pg.content()
-        soup = BeautifulSoup(cntnt, "html.parser")
-        art = soup.find("article", class_="main-content").prettify()
-        # crete an h1 tag with the title and addit to the art as the first child of the article
-
-        h1 = soup.new_tag("h1")
-        h1.string = url["title"]
-        art = art.replace(">", f">{h1}", 1)
-        content += art
-
-    await brwsr.close()
-    return content
-
 
 async def crawl_csv(df, base_dir, output_file="output_data.csv", detailed_log_path=None):  # noqa: C901
 
@@ -187,28 +164,23 @@ async def crawl_csv(df, base_dir, output_file="output_data.csv", detailed_log_pa
                         text_content = content
                         content = content.encode("utf-8")
                     elif "student-services.catalog.prod.coursedog.com" in url:
-                        content = response.text
-                        soup = BeautifulSoup(content, "html.parser")
-                        try:
-                            content = soup.find("article", class_="main-content").prettify()
-                        except AttributeError:
-                            print("Error with ", url)
-                            log_status = "PARSE_ERROR"
-                            log_reason = "Error finding main content in HTML"
-                        tablist = soup.find("div", {"role": "tablist"})
-                        if tablist:
-                            tab_links = tablist.find_all("a")
-                            # get only the links
-                            tab_links = [
-                                {
-                                    "title": link.text.strip(),
-                                    "url": url + "#" + link.get("href").split("#")[1],
-                                }
-                                for link in tab_links
-                                if "#" in link.get("href")
-                            ]
-                            tab_content = await fetch_content_from_student_services(tab_links)
-                            content += tab_content
+                        async with async_playwright() as p:
+                            browser = await p.chromium.launch()
+                            page = await browser.new_page()
+                            await page.goto(url)
+                            
+                            # Click all tabs to make sure the content is loaded
+                            tabs = await page.query_selector_all('div[role="tablist"] nav a')
+                            for tab in tabs:
+                                await tab.click()
+                                await page.wait_for_timeout(500) # wait for content to load
+
+                            # Get the full content of the article
+                            article_element = await page.query_selector('article.main-content')
+                            content = await article_element.inner_html()
+                            
+                            await browser.close()
+
                         text_content = content
                         content = content.encode("utf-8")
                     with open(filepath, "w", encoding="utf-8") as f:
