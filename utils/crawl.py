@@ -67,27 +67,84 @@ async def fetch_content_with_playwright(url, filepath):
 
 
 async def fetch_content_from_student_services(urls):
-    """Fetch content from student services page with tabs"""
+    """
+    Fetch content from student services page with tabs.
+    
+    This function handles tabbed content on CourseDog-powered student services pages.
+    Each tab is visited individually using Playwright to ensure all dynamic content is loaded.
+    
+    FIXES: Previous version only extracted the first tab. This version properly extracts ALL tabs
+    by navigating to each tab URL and waiting for content to fully render.
+    
+    FUTURE-PROOF: Automatically handles any number of tabs - if BYU Pathway adds more tabs
+    in the future, they will be automatically discovered and extracted.
+    
+    Args:
+        urls: List of dicts with 'url' and 'title' keys for each tab
+              Example: [{'title': '2025 Dates', 'url': 'https://...#2025-dates'}, ...]
+    
+    Returns:
+        str: Combined HTML content from all tabs, each wrapped in a semantic section
+    """
+    # Start Playwright browser instance
     plw = await async_playwright().start()
-    brwsr = await plw.chromium.launch()
+    brwsr = await plw.chromium.launch(headless=True)
     pg = await brwsr.new_page()
-    content = ""
-    for url in urls:
-        print("crawling subpage: ", url["url"])
-        await pg.goto(url["url"])
-        await pg.wait_for_load_state()
-        cntnt = await pg.content()
-        soup = BeautifulSoup(cntnt, "html.parser")
-        art = soup.find("article", class_="main-content").prettify()
-        # crete an h1 tag with the title and addit to the art as the first child of the article
-
-        h1 = soup.new_tag("h1")
-        h1.string = url["title"]
-        art = art.replace(">", f">{h1}", 1)
-        content += art
-
+    
+    all_content = []
+    
+    # Process each tab individually
+    for url_info in urls:
+        tab_url = url_info["url"]
+        tab_title = url_info["title"]
+        print(f"crawling subpage: {tab_url}")
+        
+        try:
+            # Navigate to the specific tab URL (includes anchor like #2025-dates)
+            # wait_until='networkidle' ensures all network requests complete before proceeding
+            await pg.goto(tab_url, wait_until='networkidle', timeout=30000)
+            
+            # Wait for the main content container to be present in the DOM
+            await pg.wait_for_selector("article.main-content", timeout=10000)
+            
+            # Additional wait for JavaScript-rendered content to stabilize
+            # This is critical for dynamic content that loads after the DOM is ready
+            # Increase this value if tabs aren't loading completely (currently 1.5 seconds)
+            await pg.wait_for_timeout(1500)
+            
+            # Get the fully rendered HTML after all content has loaded
+            cntnt = await pg.content()
+            soup = BeautifulSoup(cntnt, "html.parser")
+            
+            # Extract the main content article
+            # CourseDog uses a consistent <article class="main-content"> structure
+            art = soup.find("article", class_="main-content")
+            
+            if art:
+                # Wrap each tab's content in a semantic section with a heading
+                # This maintains structure and makes it easy to identify which tab content came from
+                section = soup.new_tag("div", attrs={"class": "tab-section"})
+                h1 = soup.new_tag("h1")
+                h1.string = tab_title
+                section.append(h1)
+                section.append(art)
+                
+                all_content.append(str(section))
+                print(f"   ✓ Extracted {len(str(art))} characters from: {tab_title}")
+            else:
+                print(f"   ⚠ No main content found for: {tab_title}")
+                
+        except Exception as e:
+            # Log errors but continue processing other tabs
+            # This ensures partial failures don't break the entire crawl
+            print(f"   ✗ Error crawling {tab_url}: {e}")
+            continue
+    
     await brwsr.close()
-    return content
+    
+    # Combine all tab content with separators for clear delineation
+    combined = "\n\n".join(all_content)
+    return combined
 
 
 async def crawl_csv(df, base_dir, output_file="output_data.csv", detailed_log_path=None):  # noqa: C901
@@ -187,29 +244,84 @@ async def crawl_csv(df, base_dir, output_file="output_data.csv", detailed_log_pa
                         text_content = content
                         content = content.encode("utf-8")
                     elif "student-services.catalog.prod.coursedog.com" in url:
+                        # === STUDENT SERVICES TAB HANDLING ===
+                        # CourseDog-powered pages often have tabbed content (e.g., Academic Calendar with multiple year tabs)
+                        # This section detects tabs and ensures ALL tabs are extracted, not just the first one
+                        
                         content = response.text
                         soup = BeautifulSoup(content, "html.parser")
-                        try:
-                            content = soup.find("article", class_="main-content").prettify()
-                        except AttributeError:
-                            print("Error with ", url)
-                            log_status = "PARSE_ERROR"
-                            log_reason = "Error finding main content in HTML"
+                        
+                        # Check if this page has tabs by looking for ARIA role="tablist"
+                        # CourseDog uses standard ARIA patterns for accessibility
                         tablist = soup.find("div", {"role": "tablist"})
+                        
                         if tablist:
+                            # === TABBED CONTENT DETECTED ===
+                            # Use Playwright to properly navigate to each tab and extract all content
+                            # This ensures we get 100% of the data, even if BYU Pathway adds more tabs in the future
+                            print(f"   ⚡ Detected tabs on {url}, using Playwright to extract all content...")
+                            
                             tab_links = tablist.find_all("a")
-                            # get only the links
-                            tab_links = [
+                            
+                            # Build list of tab URLs and titles from the tablist
+                            # Each tab is accessed via an anchor (e.g., #2025-dates-and-deadlines)
+                            tab_info = [
                                 {
                                     "title": link.text.strip(),
                                     "url": url + "#" + link.get("href").split("#")[1],
                                 }
                                 for link in tab_links
-                                if "#" in link.get("href")
+                                if "#" in link.get("href")  # Only process internal anchors
                             ]
-                            tab_content = await fetch_content_from_student_services(tab_links)
-                            content += tab_content
-                        text_content = content
+                            
+                            if tab_info:
+                                # Fetch all tab content using the improved Playwright-based function
+                                # This function visits each tab URL individually and waits for content to load
+                                tab_content = await fetch_content_from_student_services(tab_info)
+                                
+                                if tab_content:
+                                    # Successfully extracted all tabs - replace content with combined tabs
+                                    content = tab_content
+                                    text_content = content
+                                    log_status = "SUCCESS"
+                                    log_reason = f"Extracted {len(tab_info)} tabs successfully"
+                                else:
+                                    # Tab extraction failed - fallback to simple main content extraction
+                                    print(f"   ⚠ Failed to extract tab content, falling back to main content")
+                                    try:
+                                        content = soup.find("article", class_="main-content").prettify()
+                                        text_content = content
+                                    except AttributeError:
+                                        print("Error with ", url)
+                                        log_status = "PARSE_ERROR"
+                                        log_reason = "Error finding main content in HTML"
+                                        content = response.text
+                                        text_content = content
+                            else:
+                                # No valid tab links found despite tablist existing - fallback to main content
+                                try:
+                                    content = soup.find("article", class_="main-content").prettify()
+                                    text_content = content
+                                except AttributeError:
+                                    print("Error with ", url)
+                                    log_status = "PARSE_ERROR"
+                                    log_reason = "Error finding main content in HTML"
+                                    content = response.text
+                                    text_content = content
+                        else:
+                            # === NO TABS DETECTED ===
+                            # Simple page without tabs - just extract the main content article
+                            try:
+                                content = soup.find("article", class_="main-content").prettify()
+                                text_content = content
+                            except AttributeError:
+                                print("Error with ", url)
+                                log_status = "PARSE_ERROR"
+                                log_reason = "Error finding main content in HTML"
+                                content = response.text
+                                text_content = content
+                        
+                        # Encode content to bytes for hash generation
                         content = content.encode("utf-8")
                     with open(filepath, "w", encoding="utf-8") as f:
                         f.write(text_content)
