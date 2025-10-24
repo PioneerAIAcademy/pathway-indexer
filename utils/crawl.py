@@ -69,10 +69,10 @@ async def fetch_content_with_playwright(url, filepath):
 async def fetch_content_from_student_services(urls):
     """
     Extract all tabs from CourseDog student services pages.
-    
+
     Args:
         urls: List of dicts with 'url' and 'title' for each tab
-    
+
     Returns:
         Combined HTML content from all tabs
     """
@@ -334,7 +334,7 @@ async def crawl_csv(df, base_dir, output_file="output_data.csv", detailed_log_pa
                     with open(detailed_log_path, "a") as f:
                         f.write(json.dumps(log_entry) + "\n")
 
-                break
+                break  # Exit retry loop after successful fetch
 
             except requests.exceptions.HTTPError as http_err:
                 print(response.status_code)
@@ -369,7 +369,7 @@ async def crawl_csv(df, base_dir, output_file="output_data.csv", detailed_log_pa
                         with open(detailed_log_path, "a") as f:
                             f.write(json.dumps(log_entry) + "\n")
 
-                    break
+                    break  # Don't retry if it's a 403 error
                 else:
                     print(f"HTTP error occurred for {url}: {http_err}")
                     retry_attempts -= 1
@@ -431,12 +431,12 @@ async def crawl_csv(df, base_dir, output_file="output_data.csv", detailed_log_pa
                         with open(detailed_log_path, "a") as f:
                             f.write(json.dumps(log_entry) + "\n")
 
-    # Process rows in batches of 10
+    # Process rows in batches of 10 to manage memory usage efficiently
     batch_size = 10
     for i in range(0, len(df), batch_size):
-        batch = df.iloc[i : i + batch_size]
-        tasks = [process_row(row) for _, row in batch.iterrows()]
-        await asyncio.gather(*tasks)
+        batch = df.iloc[i : i + batch_size]  # Get next batch of rows
+        tasks = [process_row(row) for _, row in batch.iterrows()]  # Create tasks for batch
+        await asyncio.gather(*tasks)  # Process batch before continuing
 
     # Create a DataFrame from the output data
     output_df = pd.DataFrame(
