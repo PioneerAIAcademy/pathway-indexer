@@ -8,7 +8,7 @@ def calendar_format(input_directory, metadata_csv):
     all_links_path = os.path.join(input_directory, metadata_csv)
     all_links_df = pd.read_csv(all_links_path)
 
-    target_url = "https://student-services.catalog.prod.coursedog.com/studentservices/academic-calendar"
+    target_url = "https://studentservices.byupathway.edu/studentservices/academic-calendar"
     row = all_links_df[all_links_df["URL"] == target_url]
 
     if not row.empty:
@@ -133,7 +133,7 @@ def parse_markdown_table(markdown_text, year):
         result = []
 
         # Process first term
-        result.append(f"### Term {term_numbers[0]}:")
+        result.append(f"### Block {term_numbers[0]} {year}:")
         for row in data:
             deadline = row[0].strip()
             value = row[1].strip()
@@ -144,7 +144,7 @@ def parse_markdown_table(markdown_text, year):
         result.append("")
 
         # Process second term
-        result.append(f"### Term {term_numbers[1]}:")
+        result.append(f"### Block {term_numbers[1]} {year}:")
         for row in data:
             deadline = row[0].strip()
             value = row[2].strip()
@@ -156,7 +156,7 @@ def parse_markdown_table(markdown_text, year):
 
         # Process Semester
         if "Semester" in markdown_text:
-            result.append(f"### Semester ({semester} {year}):")
+            result.append(f"### {semester} Semester {year}:")
             for row in data:
                 deadline = row[0].strip()
                 value = row[3].strip()

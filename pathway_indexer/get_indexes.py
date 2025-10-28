@@ -29,7 +29,7 @@ def get_indexes():
     ACM_URL = "https://missionaries.prod.byu-pathway.psdops.com/ACC-site-index"
     MISSIONARY_URL = "https://missionaries.prod.byu-pathway.psdops.com/missionary-services-site-index"
     HELP_URL = "https://help.byupathway.edu/knowledgebase/"
-    STUDENT_SERVICES_URL = "https://student-services.catalog.prod.coursedog.com/"
+    STUDENT_SERVICES_URL = "https://studentservices.byupathway.edu/"
 
     acm_path = f"{DATA_PATH}/index/acm.csv"
     missionary_path = f"{DATA_PATH}/index/missionary.csv"
