@@ -109,7 +109,7 @@ def parse_markdown_table(markdown_text, year, semester):
         result = []
 
         # Process first term
-        result.append(f"### Block {term_numbers[0]} {year}:")
+        result.append(f"### Block/Term {term_numbers[0]} {year}:")
         for row in data:
             deadline = row[0].strip()
             value = row[1].strip()
@@ -120,7 +120,7 @@ def parse_markdown_table(markdown_text, year, semester):
         result.append("")
 
         # Process second term
-        result.append(f"### Block {term_numbers[1]} {year}:")
+        result.append(f"### Block/Term {term_numbers[1]} {year}:")
         for row in data:
             deadline = row[0].strip()
             value = row[2].strip()
