@@ -115,6 +115,9 @@ def get_indexes():
 
     df.fillna("Missing", inplace=True)
 
+    # Normalize the domain
+    df["URL"] = df["URL"].str.replace("student-services.catalog.prod.coursedog.com", "studentservices.byupathway.edu")
+
     # remove from the urls, the # and everything after it
     df["URL"] = df["URL"].str.split("#").str[0]
 
