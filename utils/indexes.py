@@ -6,6 +6,7 @@ import requests
 from bs4 import BeautifulSoup, Tag
 from playwright.async_api import async_playwright
 import time
+from urllib.parse import urljoin
 
 from utils.tools import create_folder
 
@@ -262,14 +263,26 @@ async def get_services_links(url):
     for li in li_elems:
         links = li.find_all("a")
         for link in links:
-            # sort by: section, subsection, title, url
-            data.append(
-                [
-                    li.find("span").text,
-                    "",
-                    link.find("span").text.strip(),
-                    url[:-1] + link["href"],
-                ]
-            )
+            href = link.get("href")
+            if href:
+                # Create the full URL, handling both relative and absolute paths
+                full_url = urljoin(url, href)
+
+                # Normalize the domain if it's the old one
+                if "student-services.catalog.prod.coursedog.com" in full_url:
+                    full_url = full_url.replace(
+                        "student-services.catalog.prod.coursedog.com",
+                        "studentservices.byupathway.edu",
+                    )
+
+                # sort by: section, subsection, title, url
+                data.append(
+                    [
+                        li.find("span").text,
+                        "",
+                        link.find("span").text.strip(),
+                        full_url,
+                    ]
+                )
 
     return data

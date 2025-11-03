@@ -109,6 +109,8 @@ async def crawl_csv(df, base_dir, output_file="output_data.csv", detailed_log_pa
 
     async def process_row(row):  # noqa: C901
         url = row["URL"]
+        if "student-services.catalog.prod.coursedog.com" in url:
+            url = url.replace("student-services.catalog.prod.coursedog.com", "studentservices.byupathway.edu")
         heading = row["Section"]
         sub_heading = row["Subsection"]
         title = row["Title"]
@@ -186,7 +188,7 @@ async def crawl_csv(df, base_dir, output_file="output_data.csv", detailed_log_pa
                         content = soup.find("div", class_="wrapper-body").prettify()
                         text_content = content
                         content = content.encode("utf-8")
-                    elif "student-services.catalog.prod.coursedog.com" in url:
+                    elif "studentservices.byupathway.edu" in url:
                         content = response.text
                         soup = BeautifulSoup(content, "html.parser")
                         try:

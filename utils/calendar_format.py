@@ -8,7 +8,7 @@ def calendar_format(input_directory, metadata_csv):
     all_links_path = os.path.join(input_directory, metadata_csv)
     all_links_df = pd.read_csv(all_links_path)
 
-    target_url = "https://student-services.catalog.prod.coursedog.com/studentservices/academic-calendar"
+    target_url = "https://studentservices.byupathway.edu/studentservices/academic-calendar"
     row = all_links_df[all_links_df["URL"] == target_url]
 
     if not row.empty:
@@ -26,12 +26,9 @@ def calendar_format(input_directory, metadata_csv):
                 # Transforming the content
                 updated_content = transform_document(content)
 
-                # Combining transformed content and parsed tables
-                combined_content = updated_content + "\n\n"
-
                 # Save changes
                 with open(file_path, "w", encoding="utf-8") as file:
-                    file.write(combined_content)
+                    file.write(updated_content)
 
                 print(f"Calendar tables transformed successfully in {file_path}")
             except Exception as e:
@@ -45,24 +42,20 @@ def calendar_format(input_directory, metadata_csv):
 
 def transform_document(content):
     # Regular expressions for searching headers and tables
-    pattern = r"(### (Spring|Winter|Fall) \d{4}\n.*?(\n\n|\Z))"
-    # Find all header and table matches.
+    pattern = r"(### (Spring|Winter|Fall) (\d{4})\n(.*?)(?=\n### |\Z))"
     matches = re.finditer(pattern, content, re.DOTALL)
 
-    # Regular expression for search the year
-    year_match = re.search(r"# (\d{4}) Start/End Dates \\& Deadlines", content)
-    year = year_match.group(1)
-
     updated_content = content  # Copy the original content
-    parsed_results = []
 
     # Process the extracted tables
     for match in matches:
         section = match.group(0)
-        header, table = section.split("\n", 1) if "\n" in section else (section, "")
-        # Pass the table and the year
-        parsed_table = parse_markdown_table(table.strip(), year)
-        # parsed_results.append(parsed_table)
+        semester_name = match.group(2)
+        year = match.group(3)
+        table = match.group(4)
+
+        # Pass the table, year, and semester name
+        parsed_table = parse_markdown_table(table.strip(), year, semester_name)
 
         # Replace the original section with the transformed content
         replacement = f"{parsed_table}\n\n"
@@ -72,26 +65,11 @@ def transform_document(content):
     return updated_content.strip()
 
 
-def parse_markdown_table(markdown_text, year):
+def parse_markdown_table(markdown_text, year, semester):
     """Convert markdown table to bullet point format, handling any term numbers."""
     try:
-        # Split input into lines and get the title
+        # Split input into lines
         lines = markdown_text.strip().split("\n")
-        title = lines[0].strip()
-        first_line = title.split("|")
-
-        semester = ""
-        for i in first_line:
-            print(i)
-            if "Term 1" in i:
-                semester = "Winter"
-                break  # Sale del bucle al encontrar coincidencia
-            elif "Term 3" in i:
-                semester = "Spring"
-                break
-            elif "Term 5" in i:
-                semester = "Fall"
-                break
 
         # Find the table lines
         table_lines = [line.strip() for line in lines if "|" in line]
@@ -102,10 +80,8 @@ def parse_markdown_table(markdown_text, year):
         if len(table_lines) < 2:  # We need at least headers and a data row
             return markdown_text
 
-        # Parse headers and data
-        headers = [col.strip().replace("*", "") for col in table_lines[0].split("|")[1:-1]]
-
         # Get term numbers from headers
+        headers = [col.strip().replace("*", "") for col in table_lines[0].split("|")[1:-1]]
         term_numbers = []
         for header in headers[1:3]:  # Look at Term X columns
             try:
@@ -133,7 +109,7 @@ def parse_markdown_table(markdown_text, year):
         result = []
 
         # Process first term
-        result.append(f"### Term {term_numbers[0]}:")
+        result.append(f"### Block/Term {term_numbers[0]} {year}:")
         for row in data:
             deadline = row[0].strip()
             value = row[1].strip()
@@ -144,7 +120,7 @@ def parse_markdown_table(markdown_text, year):
         result.append("")
 
         # Process second term
-        result.append(f"### Term {term_numbers[1]}:")
+        result.append(f"### Block/Term {term_numbers[1]} {year}:")
         for row in data:
             deadline = row[0].strip()
             value = row[2].strip()
@@ -156,7 +132,7 @@ def parse_markdown_table(markdown_text, year):
 
         # Process Semester
         if "Semester" in markdown_text:
-            result.append(f"### Semester ({semester} {year}):")
+            result.append(f"### {semester} Semester {year}:")
             for row in data:
                 deadline = row[0].strip()
                 value = row[3].strip()

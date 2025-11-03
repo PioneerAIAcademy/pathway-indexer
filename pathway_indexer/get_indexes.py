@@ -29,7 +29,7 @@ def get_indexes():
     ACM_URL = "https://missionaries.prod.byu-pathway.psdops.com/ACC-site-index"
     MISSIONARY_URL = "https://missionaries.prod.byu-pathway.psdops.com/missionary-services-site-index"
     HELP_URL = "https://help.byupathway.edu/knowledgebase/"
-    STUDENT_SERVICES_URL = "https://student-services.catalog.prod.coursedog.com/"
+    STUDENT_SERVICES_URL = "https://studentservices.byupathway.edu/"
 
     acm_path = f"{DATA_PATH}/index/acm.csv"
     missionary_path = f"{DATA_PATH}/index/missionary.csv"
@@ -114,6 +114,9 @@ def get_indexes():
     df = pd.concat([df, df2, df3, df4], ignore_index=True)
 
     df.fillna("Missing", inplace=True)
+
+    # Normalize the domain
+    df["URL"] = df["URL"].str.replace("student-services.catalog.prod.coursedog.com", "studentservices.byupathway.edu")
 
     # remove from the urls, the # and everything after it
     df["URL"] = df["URL"].str.split("#").str[0]
