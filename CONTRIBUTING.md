@@ -1,133 +1,128 @@
-# Contributing to `pathway-indexer`
+# Contributing to pathway-indexer
 
-Contributions are welcome, and they are greatly appreciated!
-Every little bit helps, and credit will always be given.
+Contributions are welcome, and they are greatly appreciated! Every little bit helps, and credit will always be given.
 
-You can contribute in many ways:
+## Ways to Contribute
 
-# Types of Contributions
-
-## Report Bugs
+### Report Bugs
 
 Report bugs at https://github.com/PioneerAIAcademy/pathway-indexer/issues
 
 If you are reporting a bug, please include:
 
-- Your operating system name and version.
-- Any details about your local setup that might be helpful in troubleshooting.
-- Detailed steps to reproduce the bug.
+- Your operating system name and version
+- Any details about your local setup that might be helpful in troubleshooting
+- Detailed steps to reproduce the bug
 
-## Fix Bugs
+### Fix Bugs or Implement Features
 
-Look through the GitHub issues for bugs.
-Anything tagged with "bug" and "help wanted" is open to whoever wants to implement a fix for it.
+Look through the GitHub issues for bugs or features:
 
-## Implement Features
+- Issues tagged with "bug" and "help wanted" are open for fixes
+- Issues tagged with "enhancement" and "help wanted" are open for implementation
 
-Look through the GitHub issues for features.
-Anything tagged with "enhancement" and "help wanted" is open to whoever wants to implement it.
+### Improve Documentation
 
-## Write Documentation
+Documentation improvements are always welcome! You can contribute by:
 
-Cookiecutter PyPackage could always use more documentation, whether as part of the official docs, in docstrings, or even on the web in blog posts, articles, and such.
+- Updating the [Wiki](https://github.com/PioneerAIAcademy/pathway-indexer/wiki)
+- Improving docstrings in the code
+- Writing blog posts or tutorials
 
-## Submit Feedback
+### Submit Feedback
 
 The best way to send feedback is to file an issue at https://github.com/PioneerAIAcademy/pathway-indexer/issues.
 
 If you are proposing a new feature:
 
-- Explain in detail how it would work.
-- Keep the scope as narrow as possible, to make it easier to implement.
-- Remember that this is a volunteer-driven project, and that contributions
-  are welcome :)
+- Explain in detail how it would work
+- Keep the scope as narrow as possible, to make it easier to implement
+- Remember that this is a volunteer-driven project, and that contributions are welcome!
 
-# Get Started!
+## Getting Started with Development
 
 Ready to contribute? Here's how to set up `pathway-indexer` for local development.
-Please note this documentation assumes you already have `poetry` and `Git` installed and ready to go.
 
-1. Fork the `pathway-indexer` repo on GitHub.
+### Prerequisites
+
+- Python 3.12
+- Poetry
+- Git
+
+For detailed setup instructions, see the **[Getting Started Guide](https://github.com/PioneerAIAcademy/pathway-indexer/wiki/Getting-Started)** on the wiki.
+
+### Setup Steps
+
+1. Fork the `pathway-indexer` repo on GitHub
 
 2. Clone your fork locally:
 
-```bash
-cd <directory_in_which_repo_should_be_created>
-git clone git@github.com:YOUR_NAME/pathway-indexer.git
-```
+   ```bash
+   git clone git@github.com:YOUR_NAME/pathway-indexer.git
+   cd pathway-indexer
+   ```
 
-3. Now we need to install the environment. Navigate into the directory
+3. Install the environment:
 
-```bash
-cd pathway-indexer
-```
+   ```bash
+   make install
+   ```
 
-If you are using `pyenv`, select a version to use locally. (See installed versions with `pyenv versions`)
+   This will:
 
-```bash
-pyenv local <x.y.z>
-```
+   - Install dependencies via Poetry
+   - Set up pre-commit hooks for code quality
 
-Then, install and activate the environment with:
+4. Create a branch for your changes:
 
-```bash
-poetry install
-poetry shell
-```
+   ```bash
+   git checkout -b name-of-your-bugfix-or-feature
+   ```
 
-4. Install pre-commit to run linters/formatters at commit time:
+5. Make your changes locally
 
-```bash
-poetry run pre-commit install
-```
+6. Add test cases for your functionality to the `tests/` directory
 
-5. Create a branch for local development:
+7. Run code quality checks:
 
-```bash
-git checkout -b name-of-your-bugfix-or-feature
-```
+   ```bash
+   make check    # Run linters and type checking
+   make test     # Run tests with coverage
+   ```
 
-Now you can make your changes locally.
+8. Commit and push your changes:
 
-6. Don't forget to add test cases for your added functionality to the `tests` directory.
+   ```bash
+   git add .
+   git commit -m "Your detailed description of your changes"
+   git push origin name-of-your-bugfix-or-feature
+   ```
 
-7. When you're done making changes, check that your changes pass the formatting tests.
+9. Submit a pull request through the GitHub website
 
-```bash
-make check
-```
-
-Now, validate that all unit tests are passing:
-
-```bash
-make test
-```
-
-9. Before raising a pull request you should also run tox.
-   This will run the tests across different versions of Python:
-
-```bash
-tox
-```
-
-This requires you to have multiple versions of python installed.
-This step is also triggered in the CI/CD pipeline, so you could also choose to skip this step locally.
-
-10. Commit your changes and push your branch to GitHub:
-
-```bash
-git add .
-git commit -m "Your detailed description of your changes."
-git push origin name-of-your-bugfix-or-feature
-```
-
-11. Submit a pull request through the GitHub website.
-
-# Pull Request Guidelines
+## Pull Request Guidelines
 
 Before you submit a pull request, check that it meets these guidelines:
 
-1. The pull request should include tests.
+1. **Include tests**: The pull request should include tests for new functionality
+2. **Update documentation**: If the PR adds functionality, update the wiki documentation
+3. **Pass checks**: Ensure `make check` and `make test` pass
+4. **Follow conventions**: Follow the existing code style and naming conventions
 
-2. If the pull request adds functionality, the docs should be updated.
-   Put your new functionality into a function with a docstring, and add the feature to the list in `README.md`.
+## Development Resources
+
+For more detailed information about the project:
+
+- **[Project Structure](https://github.com/PioneerAIAcademy/pathway-indexer/wiki/Project-Structure)** - Understanding the codebase
+- **[Advanced Topics](https://github.com/PioneerAIAcademy/pathway-indexer/wiki/Advanced-Topics)** - Deep dives into implementation
+- **[Common Tasks](https://github.com/PioneerAIAcademy/pathway-indexer/wiki/Common-Tasks)** - Troubleshooting and how-tos
+
+## Questions?
+
+If you have questions or need help, feel free to:
+
+- Open an issue on GitHub
+- Check the [Wiki](https://github.com/PioneerAIAcademy/pathway-indexer/wiki) for documentation
+- Contact the project maintainers
+
+Thank you for contributing! 🙏
