@@ -101,7 +101,7 @@ Before you begin, make sure you have:
   - OpenAI (embeddings)
   - Pinecone (vector database)
   - Langfuse (chatbot telemetry)
-  - Check [.env.example](https://github.com/DallanQ/pathway-indexer/blob/main/.env.example) for more
+  - Check [.env.example](https://github.com/PioneerAIAcademy/pathway-indexer/blob/main/.env.example) for more
 
 ### Installation Steps
 

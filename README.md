@@ -1,14 +1,14 @@
 # pathway-indexer
 
-[![Release](https://img.shields.io/github/v/release/DallanQ/pathway-indexer)](https://img.shields.io/github/v/release/DallanQ/pathway-indexer)
-[![Build status](https://img.shields.io/github/actions/workflow/status/DallanQ/pathway-indexer/main.yml?branch=main)](https://github.com/DallanQ/pathway-indexer/actions/workflows/main.yml?query=branch%3Amain)
-[![codecov](https://codecov.io/gh/DallanQ/pathway-indexer/branch/main/graph/badge.svg)](https://codecov.io/gh/DallanQ/pathway-indexer)
-[![Commit activity](https://img.shields.io/github/commit-activity/m/DallanQ/pathway-indexer)](https://img.shields.io/github/commit-activity/m/DallanQ/pathway-indexer)
-[![License](https://img.shields.io/github/license/DallanQ/pathway-indexer)](https://img.shields.io/github/license/DallanQ/pathway-indexer)
+[![Release](https://img.shields.io/github/v/release/PioneerAIAcademy/pathway-indexer)](https://img.shields.io/github/v/release/PioneerAIAcademy/pathway-indexer)
+[![Build status](https://img.shields.io/github/actions/workflow/status/PioneerAIAcademy/pathway-indexer/main.yml?branch=main)](https://github.com/PioneerAIAcademy/pathway-indexer/actions/workflows/main.yml?query=branch%3Amain)
+[![codecov](https://codecov.io/gh/PioneerAIAcademy/pathway-indexer/branch/main/graph/badge.svg)](https://codecov.io/gh/PioneerAIAcademy/pathway-indexer)
+[![Commit activity](https://img.shields.io/github/commit-activity/m/PioneerAIAcademy/pathway-indexer)](https://img.shields.io/github/commit-activity/m/PioneerAIAcademy/pathway-indexer)
+[![License](https://img.shields.io/github/license/PioneerAIAcademy/pathway-indexer)](https://img.shields.io/github/license/PioneerAIAcademy/pathway-indexer)
 
 Create and maintain the index for the BYU Pathway service missionary chatbot
 
-- **Github repository**: <https://github.com/DallanQ/pathway-indexer/>
+- **Github repository**: <https://github.com/PioneerAIAcademy/pathway-indexer/>
 - **Documentation** <https://DallanQ.github.io/pathway-indexer/>
 
 ## Getting started with your project
@@ -92,6 +92,7 @@ poetry run python main.py
 ```bash
 poetry run python store.py
 ```
+
 ---
 
 ### Running the Langfuse Data Extraction
@@ -108,4 +109,4 @@ By default, the script will process data from the last 7 days. You can change th
 
 ```bash
 poetry run python extract_questions.py --days 14
-``` 
+```
