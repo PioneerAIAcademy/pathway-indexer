@@ -1,4 +1,4 @@
-# Contributing to pathway-indexer
+# Contributing to `pathway-indexer`
 
 Contributions are welcome, and they are greatly appreciated! Every little bit helps, and credit will always be given.
 
