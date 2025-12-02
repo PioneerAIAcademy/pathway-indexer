@@ -25,7 +25,7 @@ Look through the GitHub issues for bugs or features:
 
 Documentation improvements are always welcome! You can contribute by:
 
-- Updating the [Wiki](https://github.com/PioneerAIAcademy/pathway-indexer/wiki)
+- Updating the docs in the [`docs/`](docs/) folder
 - Improving docstrings in the code
 - Writing blog posts or tutorials
 
@@ -49,7 +49,7 @@ Ready to contribute? Here's how to set up `pathway-indexer` for local developmen
 - Poetry
 - Git
 
-For detailed setup instructions, see the **[Getting Started Guide](https://github.com/PioneerAIAcademy/pathway-indexer/wiki/Getting-Started)** on the wiki.
+For detailed setup instructions, see [Getting Started](docs/getting-started.md).
 
 ### Setup Steps
 
@@ -105,24 +105,23 @@ For detailed setup instructions, see the **[Getting Started Guide](https://githu
 Before you submit a pull request, check that it meets these guidelines:
 
 1. **Include tests**: The pull request should include tests for new functionality
-2. **Update documentation**: If the PR adds functionality, update the wiki documentation
+2. **Update documentation**: If the PR adds functionality, update the docs
 3. **Pass checks**: Ensure `make check` and `make test` pass
 4. **Follow conventions**: Follow the existing code style and naming conventions
 
 ## Development Resources
 
-For more detailed information about the project:
-
-- **[Project Structure](https://github.com/PioneerAIAcademy/pathway-indexer/wiki/Project-Structure)** - Understanding the codebase
-- **[Advanced Topics](https://github.com/PioneerAIAcademy/pathway-indexer/wiki/Advanced-Topics)** - Deep dives into implementation
-- **[Common Tasks](https://github.com/PioneerAIAcademy/pathway-indexer/wiki/Common-Tasks)** - Troubleshooting and how-tos
+- [Getting Started](docs/getting-started.md) - Setup and installation
+- [Pipeline Guide](docs/pipeline-guide.md) - Understanding the scripts
+- [Project Structure](docs/project-structure.md) - Codebase layout
+- [Troubleshooting](docs/troubleshooting.md) - Common issues
 
 ## Questions?
 
 If you have questions or need help, feel free to:
 
 - Open an issue on GitHub
-- Check the [Wiki](https://github.com/PioneerAIAcademy/pathway-indexer/wiki) for documentation
+- Check the [docs](docs/) folder for documentation
 - Contact the project maintainers
 
 Thank you for contributing! 🙏

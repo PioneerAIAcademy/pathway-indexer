@@ -6,54 +6,107 @@
 [![Commit activity](https://img.shields.io/github/commit-activity/m/PioneerAIAcademy/pathway-indexer)](https://img.shields.io/github/commit-activity/m/PioneerAIAcademy/pathway-indexer)
 [![License](https://img.shields.io/github/license/PioneerAIAcademy/pathway-indexer)](https://img.shields.io/github/license/PioneerAIAcademy/pathway-indexer)
 
-Data pipeline that powers the [BYU Pathway Missionary-Assistant Chatbot](https://missionary-chat.onrender.com/).
+Create and maintain the index for the BYU Pathway Missionary Assistant chatbot.
 
-This pipeline automatically crawls BYU Pathway websites, downloads content, converts to markdown, creates vector embeddings, and indexes to Pinecone for semantic search.
+## 📖 Documentation
 
-## Documentation
+| Document                                   | Description                                      |
+| ------------------------------------------ | ------------------------------------------------ |
+| [Getting Started](docs/getting-started.md) | Installation, environment setup, and credentials |
+| [Pipeline Guide](docs/pipeline-guide.md)   | Running the three main scripts                   |
+| [Troubleshooting](docs/troubleshooting.md) | Common issues and solutions                      |
 
-📚 **[Complete Documentation on Wiki →](https://github.com/PioneerAIAcademy/pathway-indexer/wiki)**
+## What This Project Does
 
-- [Getting Started](https://github.com/PioneerAIAcademy/pathway-indexer/wiki/Getting-Started) - Installation and setup
-- [Pipeline Overview](https://github.com/PioneerAIAcademy/pathway-indexer/wiki/Pipeline-Overview) - Understanding the three main scripts
-- [Main Pipeline](https://github.com/PioneerAIAcademy/pathway-indexer/wiki/Main-Pipeline) - Running `main.py`
-- [Vector Indexing](https://github.com/PioneerAIAcademy/pathway-indexer/wiki/Vector-Indexing) - Running `store.py`
-- [Common Tasks](https://github.com/PioneerAIAcademy/pathway-indexer/wiki/Common-Tasks) - Troubleshooting and how-tos
+The **BYU Pathway Indexer** is a data pipeline that:
+
+1. Crawls BYU Pathway websites (ACM, Missionary Services, Help Center, Student Services)
+2. Downloads HTML and PDF content
+3. Converts to markdown with metadata
+4. Creates vector embeddings using OpenAI
+5. Indexes to Pinecone for the [Missionary Chatbot](https://github.com/PioneerAIAcademy/pathway-chatbot)
 
 ## Quick Start
 
-Install dependencies and pre-commit hooks:
-
 ```bash
+# Install dependencies
 make install
+
+# Run commands with Poetry
+poetry run python main.py
+poetry run python store.py
 ```
 
-Activate the virtual environment:
+> **Note:** If you're using Poetry 2.x, the `poetry shell` command is not included by default.
+> Use `poetry run` or `source .venv/bin/activate` instead.
+
+See [Getting Started](docs/getting-started.md) for full setup instructions.
+
+---
+
+## Shared Data Directory
+
+The `data` directory is excluded from git and managed via SSH to the production server.
+
+### Setup
+
+Contact @DallanQ to get:
+
+1. SSH key file (`.pem`)
+2. Your individual account credentials
+3. Server connection details
+
+### Usage
 
 ```bash
-source .venv/bin/activate
-# Or use: poetry run <command>
+make pull-data   # Download data from shared server
+make push-data   # Upload data to shared server
 ```
 
-For detailed setup instructions, environment configuration, and first run guide, see the **[Getting Started Guide](https://github.com/PioneerAIAcademy/pathway-indexer/wiki/Getting-Started)** on the wiki.
+> **Important:**
+> The shared data directory doesn't have version control. Add date-stamps to filenames so you don't accidentally overwrite files.
 
-## Running the Pipeline
+---
 
-See the wiki for detailed guides:
+## Weekly: Load New Data
 
-- **[Main Pipeline Guide](https://github.com/PioneerAIAcademy/pathway-indexer/wiki/Main-Pipeline)** - Crawling and parsing (`main.py`)
-- **[Vector Indexing Guide](https://github.com/PioneerAIAcademy/pathway-indexer/wiki/Vector-Indexing)** - Embedding and indexing (`store.py`)
-- **[User Feedback Guide](https://github.com/PioneerAIAcademy/pathway-indexer/wiki/User-Feedback-Pipeline)** - Extracting questions (`extract_questions.py`)
+1. Create a new subdirectory in the `data/` folder (with today's date, e.g. `data_07_10_25/`)
+2. Update your `.env` file with the new path: `DATA_PATH=data/data_07_10_25`
 
-## Contributing
+### Run Crawler
 
-Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+```bash
+poetry run python main.py
+```
+
+### Load the Data into the Index
+
+```bash
+poetry run python store.py
+```
+
+> **Tip:**
+> See [Pipeline Guide](docs/pipeline-guide.md) for detailed information on each script.
+
+---
+
+## Running the Langfuse Data Extraction
+
+The Langfuse data extraction is run as a standalone script. This script will download and process data from Langfuse to extract user questions.
+
+```bash
+poetry run python extract_questions.py
+```
+
+By default, the script will process data from the last 7 days. You can change this by using the `--days` argument:
+
+```bash
+poetry run python extract_questions.py --days 14
+```
+
+---
 
 ## Related Projects
 
-- **Chatbot**: [pathway-chatbot](https://github.com/DallanQ/pathway-chatbot) - The RAG chatbot that uses this index
-- **Live Demo**: [missionary-chat.onrender.com](https://missionary-chat.onrender.com/)
-
-## License
-
-This project is licensed under the terms in the [LICENSE](LICENSE) file.
+- [pathway-chatbot](https://github.com/PioneerAIAcademy/pathway-chatbot) - The RAG chatbot using this index
+- [pathway-questions-topic-modelling](https://github.com/PioneerAIAcademy/pathway-questions-topic-modelling) - Topic analysis for user questions
