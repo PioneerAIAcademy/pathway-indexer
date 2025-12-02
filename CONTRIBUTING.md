@@ -1,127 +1,133 @@
 # Contributing to `pathway-indexer`
 
-Contributions are welcome, and they are greatly appreciated! Every little bit helps, and credit will always be given.
+Contributions are welcome, and they are greatly appreciated!
+Every little bit helps, and credit will always be given.
 
-## Ways to Contribute
+You can contribute in many ways:
 
-### Report Bugs
+# Types of Contributions
+
+## Report Bugs
 
 Report bugs at https://github.com/PioneerAIAcademy/pathway-indexer/issues
 
 If you are reporting a bug, please include:
 
-- Your operating system name and version
-- Any details about your local setup that might be helpful in troubleshooting
-- Detailed steps to reproduce the bug
+- Your operating system name and version.
+- Any details about your local setup that might be helpful in troubleshooting.
+- Detailed steps to reproduce the bug.
 
-### Fix Bugs or Implement Features
+## Fix Bugs
 
-Look through the GitHub issues for bugs or features:
+Look through the GitHub issues for bugs.
+Anything tagged with "bug" and "help wanted" is open to whoever wants to implement a fix for it.
 
-- Issues tagged with "bug" and "help wanted" are open for fixes
-- Issues tagged with "enhancement" and "help wanted" are open for implementation
+## Implement Features
 
-### Improve Documentation
+Look through the GitHub issues for features.
+Anything tagged with "enhancement" and "help wanted" is open to whoever wants to implement it.
 
-Documentation improvements are always welcome! You can contribute by:
+## Write Documentation
 
-- Updating the docs in the [`docs/`](docs/) folder
-- Improving docstrings in the code
-- Writing blog posts or tutorials
+Documentation improvements are always welcome! See the [`docs/`](docs/) folder.
 
-### Submit Feedback
+## Submit Feedback
 
 The best way to send feedback is to file an issue at https://github.com/PioneerAIAcademy/pathway-indexer/issues.
 
 If you are proposing a new feature:
 
-- Explain in detail how it would work
-- Keep the scope as narrow as possible, to make it easier to implement
-- Remember that this is a volunteer-driven project, and that contributions are welcome!
+- Explain in detail how it would work.
+- Keep the scope as narrow as possible, to make it easier to implement.
+- Remember that this is a volunteer-driven project, and that contributions
+  are welcome :)
 
-## Getting Started with Development
+# Get Started!
 
 Ready to contribute? Here's how to set up `pathway-indexer` for local development.
+Please note this documentation assumes you already have `poetry` and `Git` installed and ready to go.
 
-### Prerequisites
-
-- Python 3.12
-- Poetry
-- Git
-
-For detailed setup instructions, see [Getting Started](docs/getting-started.md).
-
-### Setup Steps
-
-1. Fork the `pathway-indexer` repo on GitHub
+1. Fork the `pathway-indexer` repo on GitHub.
 
 2. Clone your fork locally:
 
-   ```bash
-   git clone git@github.com:YOUR_NAME/pathway-indexer.git
-   cd pathway-indexer
-   ```
+```bash
+cd <directory_in_which_repo_should_be_created>
+git clone git@github.com:YOUR_NAME/pathway-indexer.git
+```
 
-3. Install the environment:
+3. Now we need to install the environment. Navigate into the directory
 
-   ```bash
-   make install
-   ```
+```bash
+cd pathway-indexer
+```
 
-   This will:
+If you are using `pyenv`, select a version to use locally. (See installed versions with `pyenv versions`)
 
-   - Install dependencies via Poetry
-   - Set up pre-commit hooks for code quality
+```bash
+pyenv local <x.y.z>
+```
 
-4. Create a branch for your changes:
+Then, install and activate the environment with:
 
-   ```bash
-   git checkout -b name-of-your-bugfix-or-feature
-   ```
+```bash
+poetry install
+poetry shell
+```
 
-5. Make your changes locally
+4. Install pre-commit to run linters/formatters at commit time:
 
-6. Add test cases for your functionality to the `tests/` directory
+```bash
+poetry run pre-commit install
+```
 
-7. Run code quality checks:
+5. Create a branch for local development:
 
-   ```bash
-   make check    # Run linters and type checking
-   make test     # Run tests with coverage
-   ```
+```bash
+git checkout -b name-of-your-bugfix-or-feature
+```
 
-8. Commit and push your changes:
+Now you can make your changes locally.
 
-   ```bash
-   git add .
-   git commit -m "Your detailed description of your changes"
-   git push origin name-of-your-bugfix-or-feature
-   ```
+6. Don't forget to add test cases for your added functionality to the `tests` directory.
 
-9. Submit a pull request through the GitHub website
+7. When you're done making changes, check that your changes pass the formatting tests.
 
-## Pull Request Guidelines
+```bash
+make check
+```
+
+Now, validate that all unit tests are passing:
+
+```bash
+make test
+```
+
+9. Before raising a pull request you should also run tox.
+   This will run the tests across different versions of Python:
+
+```bash
+tox
+```
+
+This requires you to have multiple versions of python installed.
+This step is also triggered in the CI/CD pipeline, so you could also choose to skip this step locally.
+
+10. Commit your changes and push your branch to GitHub:
+
+```bash
+git add .
+git commit -m "Your detailed description of your changes."
+git push origin name-of-your-bugfix-or-feature
+```
+
+11. Submit a pull request through the GitHub website.
+
+# Pull Request Guidelines
 
 Before you submit a pull request, check that it meets these guidelines:
 
-1. **Include tests**: The pull request should include tests for new functionality
-2. **Update documentation**: If the PR adds functionality, update the docs
-3. **Pass checks**: Ensure `make check` and `make test` pass
-4. **Follow conventions**: Follow the existing code style and naming conventions
+1. The pull request should include tests.
 
-## Development Resources
-
-- [Getting Started](docs/getting-started.md) - Setup and installation
-- [Pipeline Guide](docs/pipeline-guide.md) - Understanding the scripts
-- [Project Structure](docs/project-structure.md) - Codebase layout
-- [Troubleshooting](docs/troubleshooting.md) - Common issues
-
-## Questions?
-
-If you have questions or need help, feel free to:
-
-- Open an issue on GitHub
-- Check the [docs](docs/) folder for documentation
-- Contact the project maintainers
-
-Thank you for contributing! 🙏
+2. If the pull request adds functionality, the docs should be updated.
+   Put your new functionality into a function with a docstring, and update the [`docs/`](docs/) folder if needed.
