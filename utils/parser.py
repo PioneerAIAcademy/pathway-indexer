@@ -584,6 +584,7 @@ def process_file(file_path, out_folder, stats, empty_llamaparse_files_counted, d
     if file_path.lower().endswith(".pdf"):
         # Handle PDF file
         stats["documents_sent_to_llamaparse"] += 1
+        stats["total_pdfs_attempted"] = stats.get("total_pdfs_attempted", 0) + 1
         log_entry = {
             "timestamp": datetime.datetime.now().isoformat(),
             "stage": "parse",
@@ -618,8 +619,12 @@ def process_file(file_path, out_folder, stats, empty_llamaparse_files_counted, d
                 if detailed_log_path:
                     with open(detailed_log_path, "a") as f:
                         f.write(json.dumps(log_entry) + "\n")
+                stats["pdfs_successfully_parsed"] = stats.get("pdfs_successfully_parsed", 0) + 1
                 break
-            print("Error parsing PDF file. Retrying...")
+            if url:
+                print(f"Error parsing PDF file (URL: {url}). Retrying...")
+            else:
+                print("Error parsing PDF file. Retrying...")
             log_entry = {
                 "timestamp": datetime.datetime.now().isoformat(),
                 "stage": "parse",
@@ -660,6 +665,7 @@ def process_file(file_path, out_folder, stats, empty_llamaparse_files_counted, d
 
             # Update stats and log
             stats["documents_failed_after_retries"] += 1
+            stats["pdfs_failed"] = stats.get("pdfs_failed", 0) + 1
             log_entry = {
                 "timestamp": datetime.datetime.now().isoformat(),
                 "stage": "parse",
@@ -671,7 +677,10 @@ def process_file(file_path, out_folder, stats, empty_llamaparse_files_counted, d
                 with open(detailed_log_path, "a") as f:
                     f.write(json.dumps(log_entry) + "\n")
 
-            print(f"PDF parsing failed. Moved to {error_folder}")
+            if url:
+                print(f"PDF parsing failed (URL: {url}). Moved to {error_folder}")
+            else:
+                print(f"PDF parsing failed. Moved to {error_folder}")
             return  # Continue to next file
 
     elif file_path.lower().endswith(".html"):
