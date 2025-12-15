@@ -4,6 +4,7 @@ import json
 import logging
 import os
 import re
+import shutil
 import time
 
 import nest_asyncio
@@ -583,6 +584,7 @@ def process_file(file_path, out_folder, stats, empty_llamaparse_files_counted, d
     if file_path.lower().endswith(".pdf"):
         # Handle PDF file
         stats["documents_sent_to_llamaparse"] += 1
+        stats["total_pdfs_attempted"] = stats.get("total_pdfs_attempted", 0) + 1
         log_entry = {
             "timestamp": datetime.datetime.now().isoformat(),
             "stage": "parse",
@@ -617,8 +619,12 @@ def process_file(file_path, out_folder, stats, empty_llamaparse_files_counted, d
                 if detailed_log_path:
                     with open(detailed_log_path, "a") as f:
                         f.write(json.dumps(log_entry) + "\n")
+                stats["pdfs_successfully_parsed"] = stats.get("pdfs_successfully_parsed", 0) + 1
                 break
-            print("Error parsing PDF file. Retrying...")
+            if url:
+                print(f"Error parsing PDF file (URL: {url}). Retrying...")
+            else:
+                print("Error parsing PDF file. Retrying...")
             log_entry = {
                 "timestamp": datetime.datetime.now().isoformat(),
                 "stage": "parse",
@@ -630,6 +636,52 @@ def process_file(file_path, out_folder, stats, empty_llamaparse_files_counted, d
                 with open(detailed_log_path, "a") as f:
                     f.write(json.dumps(log_entry) + "\n")
             time.sleep(4)
+
+        # If PDF parsing failed after all retries
+        if txt_file_path == "Error":
+            import pandas as pd
+
+            # Log to error.csv
+            error_data = [{
+                "filepath": file_path,
+                "URL": url if url else "N/A",
+                "error_type": "PDF_PARSING_FAILED",
+                "timestamp": datetime.datetime.now().isoformat()
+            }]
+            error_df = pd.DataFrame(error_data)
+            data_path = os.getenv("DATA_PATH")
+            error_csv_path = os.path.join(data_path, "error", "error.csv")
+            os.makedirs(os.path.dirname(error_csv_path), exist_ok=True)
+
+            with open(error_csv_path, "a") as f:
+                f.write("\nPDF Parsing Failures\n")
+            error_df.to_csv(error_csv_path, mode="a", index=False, header=True)
+
+            # Move file to error folder in the crawl directory
+            error_folder = os.path.join(os.path.dirname(file_path), "error")
+            os.makedirs(error_folder, exist_ok=True)
+            error_file_path = os.path.join(error_folder, os.path.basename(file_path))
+            shutil.move(file_path, error_file_path)
+
+            # Update stats and log
+            stats["documents_failed_after_retries"] += 1
+            stats["pdfs_failed"] = stats.get("pdfs_failed", 0) + 1
+            log_entry = {
+                "timestamp": datetime.datetime.now().isoformat(),
+                "stage": "parse",
+                "filepath": file_path,
+                "status": "PDF_PARSING_FAILED_MOVED_TO_ERROR",
+                "reason": "PDF parsing failed after 3 retries. File moved to error folder.",
+            }
+            if detailed_log_path:
+                with open(detailed_log_path, "a") as f:
+                    f.write(json.dumps(log_entry) + "\n")
+
+            if url:
+                print(f"PDF parsing failed (URL: {url}). Moved to {error_folder}")
+            else:
+                print(f"PDF parsing failed. Moved to {error_folder}")
+            return  # Continue to next file
 
     elif file_path.lower().endswith(".html"):
         # Handle HTML file
@@ -682,7 +734,49 @@ def process_file(file_path, out_folder, stats, empty_llamaparse_files_counted, d
                     f.write(json.dumps(log_entry) + "\n")
             time.sleep(4)
 
-    if title_tag != "Error parsing.":
+        # If HTML parsing failed after all retries
+        if title_tag == "Error parsing.":
+            import pandas as pd
+
+            # Log to error.csv
+            error_data = [{
+                "filepath": file_path,
+                "URL": url if url else "N/A",
+                "error_type": "HTML_PARSING_FAILED",
+                "timestamp": datetime.datetime.now().isoformat()
+            }]
+            error_df = pd.DataFrame(error_data)
+            data_path = os.getenv("DATA_PATH")
+            error_csv_path = os.path.join(data_path, "error", "error.csv")
+            os.makedirs(os.path.dirname(error_csv_path), exist_ok=True)
+
+            with open(error_csv_path, "a") as f:
+                f.write("\nHTML Parsing Failures\n")
+            error_df.to_csv(error_csv_path, mode="a", index=False, header=True)
+
+            # Move file to error folder in the crawl directory
+            error_folder = os.path.join(os.path.dirname(file_path), "error")
+            os.makedirs(error_folder, exist_ok=True)
+            error_file_path = os.path.join(error_folder, os.path.basename(file_path))
+            shutil.move(file_path, error_file_path)
+
+            # Update stats and log
+            stats["documents_failed_after_retries"] += 1
+            log_entry = {
+                "timestamp": datetime.datetime.now().isoformat(),
+                "stage": "parse",
+                "filepath": file_path,
+                "status": "HTML_PARSING_FAILED_MOVED_TO_ERROR",
+                "reason": "HTML parsing failed after 3 retries. File moved to error folder.",
+            }
+            if detailed_log_path:
+                with open(detailed_log_path, "a") as f:
+                    f.write(json.dumps(log_entry) + "\n")
+
+            print(f"HTML parsing failed. Moved to {error_folder}")
+            return  # Continue to next file
+
+    if title_tag != "Error parsing." and txt_file_path != "Error":
         log_entry = {
             "timestamp": datetime.datetime.now().isoformat(),
             "stage": "parse",

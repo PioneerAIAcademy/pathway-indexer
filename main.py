@@ -135,6 +135,15 @@ Number of files that were processed (either new or changed).
 => documents_sent_to_llamaparse: {stats.get("documents_sent_to_llamaparse", "N/A")}
 Number of files sent to LlamaParse for conversion to markdown.
 
+=> total_pdfs_attempted: {stats.get("total_pdfs_attempted", "N/A")}
+Total number of PDF files that were attempted to be parsed.
+
+=> pdfs_successfully_parsed: {stats.get("pdfs_successfully_parsed", "N/A")}
+Number of PDF files that were successfully converted to text format.
+
+=> pdfs_failed: {stats.get("pdfs_failed", "N/A")}
+Number of PDF files that failed to parse after 3 retry attempts.
+
 => documents_empty_from_llamaparse: {stats.get("documents_empty_from_llamaparse", "N/A")}
 Number of times LlamaParse returned empty content (likely due to unsupported, blank input or API limits).
 
